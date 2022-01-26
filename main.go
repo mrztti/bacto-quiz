@@ -126,7 +126,7 @@ func createQuizlet() Quizlet {
 		panic(err)
 	}
 
-	err = os.WriteFile("archives/"+fmt.Sprint(qid)+".json", file, 0666)
+	err = ioutil.WriteFile("archives/"+fmt.Sprint(qid)+".json", file, 0666)
 	if err != nil {
 		panic(err)
 	}
