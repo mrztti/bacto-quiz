@@ -15,7 +15,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const SERVER_PORT = ":4444"
+const SERVER_PORT = ":80"
 
 type Quizlet struct {
 	Id            uint16
