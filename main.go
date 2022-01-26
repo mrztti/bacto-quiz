@@ -49,10 +49,10 @@ func main() {
 	router.HandleFunc("/quiz", quizHandler).Methods("GET")
 	router.HandleFunc("/", homeHandler).Methods("GET")
 	http.Handle("/", router)
-	fmt.Printf("Set handlers...")
+	fmt.Println("Set handlers...")
 	//start and listen to requests
 	http.ListenAndServe(SERVER_PORT, router)
-	fmt.Printf("Listening now!")
+	fmt.Println("Listening now!")
 }
 
 func timeStamp() string {

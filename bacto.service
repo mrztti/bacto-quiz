@@ -1,0 +1,14 @@
+[Unit]
+Description=Bacto Quiz WS service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/root/bacto-quiz/bacto-quiz
+
+[Install]
+WantedBy=multi-user.target
