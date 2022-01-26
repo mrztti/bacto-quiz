@@ -1,10 +1,15 @@
 package main
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -13,17 +18,24 @@ import (
 const SERVER_PORT = ":4444"
 
 type Quizlet struct {
-	Id       uint16
-	Question string
-	Ref1     uint16
-	Ref2     uint16
-	Ref3     uint16
-	Ref4     uint16
-	Option1  string
-	Option2  string
-	Option3  string
-	Option4  string
-	Answer   uint16
+	Id            uint16
+	ChosenProject string
+	Question      string
+	Ref1          uint16
+	Ref2          uint16
+	Ref3          uint16
+	Ref4          uint16
+	Option1       string
+	Option2       string
+	Option3       string
+	Option4       string
+	Answer        uint16
+}
+
+type Quizzy struct {
+	Link     string
+	Name     string
+	Property string
 }
 
 func main() {
@@ -33,8 +45,6 @@ func main() {
 	router := mux.NewRouter()
 
 	//specify endpoints, handler functions and HTTP method
-	router.HandleFunc("/data/", dataHandler).Methods("GET")
-	router.HandleFunc("/data", dataHandler).Methods("GET")
 	router.HandleFunc("/quiz/", quizHandler).Methods("GET")
 	router.HandleFunc("/quiz", quizHandler).Methods("GET")
 	router.HandleFunc("/", homeHandler).Methods("GET")
@@ -47,16 +57,81 @@ func main() {
 func timeStamp() string {
 	return time.Now().Format(time.ANSIC)
 }
+func readQuizzy(prefix string, href string) Quizzy {
+	file, err := os.Open(prefix + href)
+	if err != nil {
+		panic(err)
+	}
+	fileScanner := bufio.NewScanner(file)
+	lineCount := 0
+	var lines []string
+	for fileScanner.Scan() {
+		lineCount++
+		lines = append(lines, fileScanner.Text())
+	}
 
-func createQuizlet() Quizlet {
-	qz := Quizlet{0, "This is a test question.", 0, 0, 0, 0, "option", "option", "option", "option", 2}
+	lineTry := rand.Intn(lineCount)
+	for len(lines[lineTry]) <= 1 {
+		lineTry = rand.Intn(lineCount)
+	}
+
+	qz := Quizzy{href, href[:(len(href) - 3)], lines[lineTry]}
 	return qz
+
 }
 
-func dataHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("entering data end point")
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "API is up and running")
+func createQuizlet() Quizlet {
+	arcs, err := ioutil.ReadDir("archives/")
+	if err != nil {
+		panic(err)
+	}
+	qid := len(arcs)
+
+	projs := getProjects()
+	fmt.Println(len(projs))
+	r := rand.Intn(len(projs))
+	rd_proj := projs[r].Namespace
+	files, err := ioutil.ReadDir("data/" + rd_proj + "/")
+	if err != nil {
+		panic(err)
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	candidates := rand.Perm(len(files))
+	target := rand.Intn(4)
+
+	qz := Quizlet{uint16(qid), rd_proj, "This is a test question.", 0, 0, 0, 0, "option", "option", "option", "option", uint16(target)}
+
+	q := readQuizzy("data/"+rd_proj+"/", files[candidates[0]].Name())
+	qz.Ref1 = uint16(candidates[0])
+	qz.Option1 = q.Name
+
+	q = readQuizzy("data/"+rd_proj+"/", files[candidates[1]].Name())
+	qz.Ref2 = uint16(candidates[1])
+	qz.Option2 = q.Name
+
+	q = readQuizzy("data/"+rd_proj+"/", files[candidates[2]].Name())
+	qz.Ref3 = uint16(candidates[2])
+	qz.Option3 = q.Name
+
+	q = readQuizzy("data/"+rd_proj+"/", files[candidates[3]].Name())
+	qz.Ref4 = uint16(candidates[3])
+	qz.Option4 = q.Name
+
+	q = readQuizzy("data/"+rd_proj+"/", files[target].Name())
+	qz.Question = q.Property
+
+	file, err := json.MarshalIndent(qz, "", " ")
+	if err != nil {
+		panic(err)
+	}
+
+	err = os.WriteFile("archives/"+fmt.Sprint(qid)+".json", file, 0666)
+	if err != nil {
+		panic(err)
+	}
+
+	return qz
 }
 
 func quizHandler(w http.ResponseWriter, r *http.Request) {
@@ -72,8 +147,80 @@ func quizHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type HomeData struct {
+	WelcomeMessage string
+	Projects       []Project
+}
+
+type Project struct {
+	Namespace string
+	Objects   []DataObject
+}
+
+type DataObject struct {
+	Name       string
+	Properties []Property
+}
+
+type Property struct {
+	Value string
+}
+
+func getProjects() []Project {
+	files, err := ioutil.ReadDir("./data/")
+	if err != nil {
+		panic(err)
+	}
+	var projects []Project
+
+	for _, f := range files {
+		projects = append(projects, Project{f.Name(), getObjects(f.Name())})
+
+	}
+
+	return projects
+}
+
+func getObjects(namespace string) []DataObject {
+	objects, err := ioutil.ReadDir("./data/" + namespace)
+	if err != nil {
+		panic(err)
+	}
+	var objs []DataObject
+
+	for _, f := range objects {
+		objs = append(objs, DataObject{f.Name()[:(len(f.Name()) - 3)], getProperties("./data/" + namespace + "/" + f.Name())})
+
+	}
+
+	return objs
+}
+
+func getProperties(href string) []Property {
+	file, err := os.Open(href)
+	if err != nil {
+		panic(err)
+	}
+	fileScanner := bufio.NewScanner(file)
+	lineCount := 0
+	var lines []Property
+	for fileScanner.Scan() {
+		lineCount++
+		l := fileScanner.Text()
+		if len(l) <= 1 {
+			continue
+		}
+		lines = append(lines, Property{l})
+	}
+	return lines
+}
+
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("welcome home")
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, timeStamp())
+	home := HomeData{}
+	home.WelcomeMessage = "Salut toi"
+	home.Projects = getProjects()
+
+	tmpl := template.Must(template.ParseFiles("templates/home.tmpl"))
+	tmpl.Execute(w, home)
 }
