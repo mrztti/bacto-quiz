@@ -21,10 +21,6 @@ type Quizlet struct {
 	Id            uint16
 	ChosenProject string
 	Question      string
-	Ref1          uint16
-	Ref2          uint16
-	Ref3          uint16
-	Ref4          uint16
 	Option1       string
 	Option2       string
 	Option3       string
@@ -103,26 +99,28 @@ func createQuizlet() Quizlet {
 	candidates := rand.Perm(len(files))
 	target := rand.Intn(4)
 
-	qz := Quizlet{uint16(qid), rd_proj, "This is a test question.", 0, 0, 0, 0, "option", "option", "option", "option", int(target)}
+	qz := Quizlet{uint16(qid), rd_proj, "This is a test question.", "option", "option", "option", "option", int(target)}
+	refMap := make(map[int]int)
 
 	q := readQuizzy("data/"+rd_proj+"/", files[candidates[0]].Name())
-	qz.Ref1 = uint16(candidates[0])
+	refMap[0] = candidates[0]
 	qz.Option1 = q.Name
 
 	q = readQuizzy("data/"+rd_proj+"/", files[candidates[1]].Name())
-	qz.Ref2 = uint16(candidates[1])
+	refMap[1] = candidates[1]
 	qz.Option2 = q.Name
 
 	q = readQuizzy("data/"+rd_proj+"/", files[candidates[2]].Name())
-	qz.Ref3 = uint16(candidates[2])
+	refMap[2] = candidates[2]
 	qz.Option3 = q.Name
 
 	q = readQuizzy("data/"+rd_proj+"/", files[candidates[3]].Name())
-	qz.Ref4 = uint16(candidates[3])
+	refMap[3] = candidates[3]
 	qz.Option4 = q.Name
 
 	q = readQuizzy("data/"+rd_proj+"/", files[target].Name())
 	qz.Question = q.Property
+	qz.Answer = refMap[qz.Answer]
 
 	file, err := json.MarshalIndent(qz, "", " ")
 	if err != nil {
