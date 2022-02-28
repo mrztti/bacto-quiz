@@ -51,13 +51,15 @@ func main() {
 	http.Handle("/", router)
 	fmt.Println("Set handlers...")
 	//start and listen to requests
-	http.ListenAndServe(SERVER_PORT, router)
 	fmt.Println("Listening now!")
+	http.ListenAndServe(SERVER_PORT, router)
+
 }
 
 func timeStamp() string {
 	return time.Now().Format(time.ANSIC)
 }
+
 func readQuizzy(prefix string, href string) Quizzy {
 	file, err := os.Open(prefix + href)
 	if err != nil {
@@ -190,6 +192,7 @@ func getObjects(namespace string) []DataObject {
 	var objs []DataObject
 
 	for _, f := range objects {
+		fmt.Print(f.Name())
 		objs = append(objs, DataObject{f.Name()[:(len(f.Name()) - 3)], getProperties("./data/" + namespace + "/" + f.Name())})
 
 	}
