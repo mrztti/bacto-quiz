@@ -192,7 +192,6 @@ func getObjects(namespace string) []DataObject {
 	var objs []DataObject
 
 	for _, f := range objects {
-		fmt.Print(f.Name())
 		objs = append(objs, DataObject{f.Name()[:(len(f.Name()) - 3)], getProperties("./data/" + namespace + "/" + f.Name())})
 
 	}
@@ -216,6 +215,7 @@ func getProperties(href string) []Property {
 		}
 		lines = append(lines, Property{l})
 	}
+	fmt.Print(len(lines))
 	return lines
 }
 
