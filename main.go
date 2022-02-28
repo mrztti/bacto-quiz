@@ -121,6 +121,8 @@ func createQuizlet() Quizlet {
 	q = readQuizzy("data/"+rd_proj+"/", files[target].Name())
 	qz.Question = q.Property
 	qz.Answer = refMap[target]
+	fmt.Println(target)
+	fmt.Println(qz.Answer)
 
 	file, err := json.MarshalIndent(qz, "", " ")
 	if err != nil {
