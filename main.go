@@ -219,7 +219,7 @@ func getProperties(href string) []Property {
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("welcome home")
 	home := HomeData{}
-	home.WelcomeMessage = "Salut toi"
+	home.WelcomeMessage = "Available topics"
 	home.Projects = getProjects()
 
 	tmpl := template.Must(template.ParseFiles("templates/home.tmpl"))
