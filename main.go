@@ -120,7 +120,7 @@ func createQuizlet() Quizlet {
 
 	q = readQuizzy("data/"+rd_proj+"/", files[target].Name())
 	qz.Question = q.Property
-	qz.Answer = refMap[target]
+	qz.Answer = refMap[target+1]
 	fmt.Println(target)
 	fmt.Println(qz.Answer)
 
