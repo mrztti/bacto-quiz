@@ -100,7 +100,7 @@ func createQuizlet() Quizlet {
 	target := rand.Intn(4)
 	fmt.Println(candidates)
 
-	qz := Quizlet{uint16(qid), rd_proj, "This is a test question.", "option", "option", "option", "option", candidates[target]}
+	qz := Quizlet{uint16(qid), rd_proj, "This is a test question.", "option", "option", "option", "option", target}
 
 	q := readQuizzy("data/"+rd_proj+"/", files[candidates[0]].Name())
 	qz.Option1 = q.Name
@@ -116,8 +116,6 @@ func createQuizlet() Quizlet {
 
 	q = readQuizzy("data/"+rd_proj+"/", files[candidates[target]].Name())
 	qz.Question = q.Property
-	fmt.Println(target)
-	fmt.Println(qz.Answer)
 
 	file, err := json.MarshalIndent(qz, "", " ")
 	if err != nil {
