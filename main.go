@@ -87,8 +87,8 @@ func createQuizlet() Quizlet {
 	qid := len(arcs)
 
 	projs := getProjects()
-	fmt.Println(len(projs))
 	r := rand.Intn(len(projs))
+	fmt.Println(r)
 	rd_proj := projs[r].Namespace
 	files, err := ioutil.ReadDir("data/" + rd_proj + "/")
 	if err != nil {
@@ -98,7 +98,6 @@ func createQuizlet() Quizlet {
 	rand.Seed(time.Now().UnixNano())
 	candidates := rand.Perm(len(files))
 	target := rand.Intn(4)
-	fmt.Println(candidates)
 
 	qz := Quizlet{uint16(qid), rd_proj, "This is a test question.", "option", "option", "option", "option", target}
 
