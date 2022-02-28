@@ -100,28 +100,22 @@ func createQuizlet() Quizlet {
 	target := rand.Intn(4)
 	fmt.Println(candidates)
 
-	qz := Quizlet{uint16(qid), rd_proj, "This is a test question.", "option", "option", "option", "option", target}
-	refMap := make(map[int]int)
+	qz := Quizlet{uint16(qid), rd_proj, "This is a test question.", "option", "option", "option", "option", candidates[target]}
 
 	q := readQuizzy("data/"+rd_proj+"/", files[candidates[0]].Name())
-	refMap[0] = candidates[0]
 	qz.Option1 = q.Name
 
 	q = readQuizzy("data/"+rd_proj+"/", files[candidates[1]].Name())
-	refMap[1] = candidates[1]
 	qz.Option2 = q.Name
 
 	q = readQuizzy("data/"+rd_proj+"/", files[candidates[2]].Name())
-	refMap[2] = candidates[2]
 	qz.Option3 = q.Name
 
 	q = readQuizzy("data/"+rd_proj+"/", files[candidates[3]].Name())
-	refMap[3] = candidates[3]
 	qz.Option4 = q.Name
 
-	q = readQuizzy("data/"+rd_proj+"/", files[target].Name())
+	q = readQuizzy("data/"+rd_proj+"/", files[candidates[target]].Name())
 	qz.Question = q.Property
-	qz.Answer = refMap[target-1]
 	fmt.Println(target)
 	fmt.Println(qz.Answer)
 
