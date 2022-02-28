@@ -29,7 +29,7 @@ type Quizlet struct {
 	Option2       string
 	Option3       string
 	Option4       string
-	Answer        uint16
+	Answer        int
 }
 
 type Quizzy struct {
@@ -103,7 +103,7 @@ func createQuizlet() Quizlet {
 	candidates := rand.Perm(len(files))
 	target := rand.Intn(4)
 
-	qz := Quizlet{uint16(qid), rd_proj, "This is a test question.", 0, 0, 0, 0, "option", "option", "option", "option", uint16(target)}
+	qz := Quizlet{uint16(qid), rd_proj, "This is a test question.", 0, 0, 0, 0, "option", "option", "option", "option", int(target)}
 
 	q := readQuizzy("data/"+rd_proj+"/", files[candidates[0]].Name())
 	qz.Ref1 = uint16(candidates[0])
