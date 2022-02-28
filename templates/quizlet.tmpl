@@ -9,7 +9,7 @@
         <script>
             function give_answer(){
                 for (let i = 0; i <= 3; i++) {
-                    if(i== {{.Answer}} - 1 ){
+                    if(i==({{.Answer}} - 1) ){
                         document.getElementById('ans'+i.toString()).style.background = 'green';   
                     }else{
                         document.getElementById('ans'+i.toString()).style.background = 'red';   
