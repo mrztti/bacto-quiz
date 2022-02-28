@@ -88,7 +88,6 @@ func createQuizlet() Quizlet {
 
 	projs := getProjects()
 	r := rand.Intn(len(projs))
-	fmt.Println(r)
 	rd_proj := projs[r].Namespace
 	files, err := ioutil.ReadDir("data/" + rd_proj + "/")
 	if err != nil {
